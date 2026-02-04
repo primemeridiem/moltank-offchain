@@ -1,21 +1,45 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { SovereignSubmolt, Tip, LeaderboardEntry, AccessInfo } from '@/lib/services/api';
+import { treaty } from '@elysiajs/eden';
+import type { App } from '@/lib/eden';
 
-const API_BASE = '/api';
+// Create client-side Eden API client
+// Uses empty string as base URL which resolves to current origin
+const api = treaty<App>('').api;
+
+// Fetch platform stats
+export function useStats() {
+  return useQuery({
+    queryKey: ['stats'],
+    queryFn: async () => {
+      const { data, error } = await api.stats.get();
+      if (error) {
+        throw new Error(typeof error === 'object' && 'error' in error ? String(error.error) : 'Failed to fetch stats');
+      }
+      if (!data?.success) {
+        const errMsg = (data as { error?: string })?.error;
+        throw new Error(errMsg || 'Failed to fetch stats');
+      }
+      return data.data;
+    },
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+}
 
 // Fetch a single Sovereign Submolt
 export function useSovereignSubmolt(submoltId: string) {
   return useQuery({
     queryKey: ['sovereignSubmolt', submoltId],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE}/submolts/sovereign/${submoltId}`);
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch sovereign submolt');
+      const { data, error } = await api.submolts.sovereign({ submoltId }).get();
+      if (error) {
+        throw new Error(typeof error === 'object' && 'error' in error ? String(error.error) : 'Failed to fetch sovereign submolt');
       }
-      return data.data as SovereignSubmolt;
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to fetch sovereign submolt');
+      }
+      return data.data;
     },
     enabled: !!submoltId,
   });
@@ -26,12 +50,15 @@ export function useSovereignSubmolts() {
   return useQuery({
     queryKey: ['sovereignSubmolts'],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE}/submolts/sovereign`);
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch sovereign submolts');
+      const { data, error } = await api.submolts.sovereign.get();
+      if (error) {
+        throw new Error(typeof error === 'object' && 'error' in error ? String(error.error) : 'Failed to fetch sovereign submolts');
       }
-      return data.data as SovereignSubmolt[];
+      if (!data?.success) {
+        const errMsg = (data as { error?: string })?.error;
+        throw new Error(errMsg || 'Failed to fetch sovereign submolts');
+      }
+      return data.data ?? [];
     },
   });
 }
@@ -51,19 +78,18 @@ export function useCreateSovereignSubmolt() {
       identityToken: string;
     }) => {
       const { identityToken, ...body } = params;
-      const response = await fetch(`${API_BASE}/submolts/sovereign`, {
-        method: 'POST',
+      const { data, error } = await api.submolts.sovereign.post(body, {
         headers: {
-          'Content-Type': 'application/json',
           'x-moltbook-identity': identityToken,
         },
-        body: JSON.stringify(body),
       });
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to create sovereign submolt');
+      if (error) {
+        throw new Error(typeof error === 'object' && 'error' in error ? String(error.error) : 'Failed to create sovereign submolt');
       }
-      return data.data as SovereignSubmolt;
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to create sovereign submolt');
+      }
+      return data.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sovereignSubmolts'] });
@@ -76,12 +102,14 @@ export function useAgentAccess(submoltId: string, agentId: string) {
   return useQuery({
     queryKey: ['agentAccess', submoltId, agentId],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE}/submolts/sovereign/${submoltId}/access/${agentId}`);
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to check access');
+      const { data, error } = await api.submolts.sovereign({ submoltId }).access({ agentId }).get();
+      if (error) {
+        throw new Error(typeof error === 'object' && 'error' in error ? String(error.error) : 'Failed to check access');
       }
-      return data.data as AccessInfo;
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to check access');
+      }
+      return data.data;
     },
     enabled: !!submoltId && !!agentId,
   });
@@ -92,16 +120,16 @@ export function useTips(submoltId: string, agentId?: string) {
   return useQuery({
     queryKey: ['tips', submoltId, agentId],
     queryFn: async () => {
-      const url = new URL(`${API_BASE}/submolts/sovereign/${submoltId}/tips`, window.location.origin);
-      if (agentId) {
-        url.searchParams.set('agentId', agentId);
+      const { data, error } = await api.submolts.sovereign({ submoltId }).tips.get({
+        query: agentId ? { agentId } : undefined,
+      });
+      if (error) {
+        throw new Error(typeof error === 'object' && 'error' in error ? String(error.error) : 'Failed to fetch tips');
       }
-      const response = await fetch(url);
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch tips');
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to fetch tips');
       }
-      return data.data as Tip[];
+      return data.data ?? [];
     },
     enabled: !!submoltId,
   });
@@ -121,19 +149,18 @@ export function useSendTip() {
       identityToken: string;
     }) => {
       const { submoltId, identityToken, ...body } = params;
-      const response = await fetch(`${API_BASE}/submolts/sovereign/${submoltId}/tips`, {
-        method: 'POST',
+      const { data, error } = await api.submolts.sovereign({ submoltId }).tips.post(body, {
         headers: {
-          'Content-Type': 'application/json',
           'x-moltbook-identity': identityToken,
         },
-        body: JSON.stringify(body),
       });
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to send tip');
+      if (error) {
+        throw new Error(typeof error === 'object' && 'error' in error ? String(error.error) : 'Failed to send tip');
       }
-      return data.data as Tip;
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to send tip');
+      }
+      return data.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['tips', variables.submoltId] });
@@ -147,12 +174,14 @@ export function useLeaderboard(submoltId: string) {
   return useQuery({
     queryKey: ['leaderboard', submoltId],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE}/submolts/sovereign/${submoltId}/leaderboard`);
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch leaderboard');
+      const { data, error } = await api.submolts.sovereign({ submoltId }).leaderboard.get();
+      if (error) {
+        throw new Error(typeof error === 'object' && 'error' in error ? String(error.error) : 'Failed to fetch leaderboard');
       }
-      return data.data as LeaderboardEntry[];
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to fetch leaderboard');
+      }
+      return data.data ?? [];
     },
     enabled: !!submoltId,
   });

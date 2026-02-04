@@ -2,6 +2,8 @@
 
 export type SovereignSubmolt = {
   submoltId: string;
+  name: string;
+  description: string;
   tokenName: string;
   tokenSymbol: string;
   earlyAccessKarma: number;
@@ -10,7 +12,9 @@ export type SovereignSubmolt = {
   creatorAgentId: string;
   treasuryAddress: string;
   tokenAddress: string;
+  tokenSupply: string;
   createdAt: Date;
+  tokenDeployed: boolean;
 };
 
 export type Tip = {
@@ -36,10 +40,19 @@ export type AccessInfo = {
   canCreate: boolean;
   hasEarlyAccess: boolean;
   hasGatedChannelAccess: boolean;
+  isCreator: boolean;
+};
+
+export type Stats = {
+  totalSubmolts: number;
+  totalTips: number;
+  totalAgents: number;
+  totalVolume: string;
 };
 
 export type ApiResponse<T> = {
   success: boolean;
   data?: T;
   error?: string;
+  message?: string;
 };

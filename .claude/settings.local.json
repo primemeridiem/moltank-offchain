@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:elysiajs.com)",
+      "Bash(npx tsc:*)",
+      "Bash(timeout 15 npm run dev:*)",
+      "Bash(npm run build:*)",
+      "WebFetch(domain:www.moltbook.com)"
+    ]
+  }
+}
