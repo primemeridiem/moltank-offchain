@@ -1,73 +1,81 @@
 // Moltbook API Client
+// Based on https://www.moltbook.com/skill.md
 
 const MOLTBOOK_API_URL = 'https://www.moltbook.com/api/v1';
 
 export interface MoltbookAgent {
-  id: string;
   name: string;
+  description: string;
   karma: number;
-  avatar?: string;
-  claimed: boolean;
-  followerCount: number;
-  postCount: number;
-  commentCount: number;
+  follower_count: number;
+  following_count: number;
+  is_claimed: boolean;
+  is_active: boolean;
+  created_at: string;
+  last_active: string;
   owner?: {
-    xHandle?: string;
+    x_handle?: string;
+    x_name?: string;
+    x_avatar?: string;
   };
 }
 
 export interface MoltbookSubmolt {
-  id: string;
   name: string;
+  display_name?: string;
   description: string;
-  creatorId: string;
-  subscriberCount: number;
+  subscriber_count?: number;
+  allow_crypto?: boolean;
+  created_by?: {
+    id: string;
+    name: string;
+  };
+  moderators?: Array<{
+    name: string;
+    role: string;
+  }>;
+  your_role?: string | null;
 }
 
-export interface VerifyIdentityResponse {
-  success: boolean;
-  agent?: MoltbookAgent;
-  error?: string;
+export interface MoltbookPost {
+  id: string;
+  title?: string;
+  content: string;
+  upvotes: number;
+  downvotes: number;
+  created_at: string;
+  author: {
+    id: string;
+    name: string;
+    description?: string;
+    karma: number;
+    follower_count: number;
+    following_count: number;
+    owner?: {
+      x_handle?: string;
+      x_name?: string;
+    };
+  };
+  submolt?: {
+    name: string;
+    display_name?: string;
+  };
 }
 
 export class MoltbookClient {
-  private appKey: string;
+  private agentApiKey: string;
 
-  constructor(appKey: string) {
-    this.appKey = appKey;
+  constructor(agentApiKey: string) {
+    this.agentApiKey = agentApiKey;
   }
 
   /**
-   * Verify an agent's identity token
-   * Used when an agent authenticates with our service
+   * Fetch a post by ID from Moltbook
+   * GET /posts/POST_ID
    */
-  async verifyIdentity(token: string): Promise<VerifyIdentityResponse> {
+  async getPost(postId: string): Promise<MoltbookPost | null> {
     try {
-      const response = await fetch(`${MOLTBOOK_API_URL}/agents/verify-identity`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Moltbook-App-Key': this.appKey,
-        },
-        body: JSON.stringify({ token }),
-      });
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
-    }
-  }
-
-  /**
-   * Get agent details by ID (public info)
-   */
-  async getAgent(agentId: string): Promise<MoltbookAgent | null> {
-    try {
-      const response = await fetch(`${MOLTBOOK_API_URL}/agents/${agentId}`, {
+      const response = await fetch(`${MOLTBOOK_API_URL}/posts/${postId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +84,7 @@ export class MoltbookClient {
 
       const data = await response.json();
       if (data.success) {
-        return data.data;
+        return data.post || data.data;
       }
       return null;
     } catch {
@@ -85,11 +93,36 @@ export class MoltbookClient {
   }
 
   /**
-   * Get submolt details by ID
+   * Get agent profile by name
+   * GET /agents/profile?name=MOLTY_NAME
    */
-  async getSubmolt(submoltId: string): Promise<MoltbookSubmolt | null> {
+  async getAgent(agentName: string): Promise<MoltbookAgent | null> {
     try {
-      const response = await fetch(`${MOLTBOOK_API_URL}/submolts/${submoltId}`, {
+      const response = await fetch(`${MOLTBOOK_API_URL}/agents/profile?name=${encodeURIComponent(agentName)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.agentApiKey}`,
+        },
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        return data.agent;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Get submolt details by name
+   * GET /submolts/SUBMOLT_NAME
+   */
+  async getSubmolt(submoltName: string): Promise<MoltbookSubmolt | null> {
+    try {
+      const response = await fetch(`${MOLTBOOK_API_URL}/submolts/${encodeURIComponent(submoltName)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +131,7 @@ export class MoltbookClient {
 
       const data = await response.json();
       if (data.success) {
-        return data.data;
+        return data.submolt || data.data;
       }
       return null;
     } catch {
@@ -109,8 +142,8 @@ export class MoltbookClient {
   /**
    * Check if agent meets karma threshold
    */
-  async checkKarmaThreshold(agentId: string, threshold: number): Promise<boolean> {
-    const agent = await this.getAgent(agentId);
+  async checkKarmaThreshold(agentName: string, threshold: number): Promise<boolean> {
+    const agent = await this.getAgent(agentName);
     if (!agent) return false;
     return agent.karma >= threshold;
   }
@@ -121,11 +154,11 @@ let moltbookClient: MoltbookClient | null = null;
 
 export function getMoltbookClient(): MoltbookClient {
   if (!moltbookClient) {
-    const appKey = process.env.MOLTBOOK_APP_KEY;
-    if (!appKey) {
-      throw new Error('MOLTBOOK_APP_KEY environment variable not set');
+    const apiKey = process.env.MOLTBOOK_AGENT_API_KEY;
+    if (!apiKey) {
+      throw new Error('MOLTBOOK_AGENT_API_KEY environment variable not set');
     }
-    moltbookClient = new MoltbookClient(appKey);
+    moltbookClient = new MoltbookClient(apiKey);
   }
   return moltbookClient;
 }

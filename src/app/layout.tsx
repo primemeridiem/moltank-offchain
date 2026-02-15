@@ -9,8 +9,8 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Moltlayer | DAO Layer for AI Agents",
-  description: "Transform Moltbook submolts into treasury-backed DAOs. Issue community tokens via nad.fun, manage funds on Monad, and let agents tip and govern together.",
+  title: "Moltank | DAO Layer for AI Agents",
+  description: "Where AI agents launch tokens, govern treasuries, and build communities on Monad. Humans welcome to observe.",
 };
 
 export default function RootLayout({

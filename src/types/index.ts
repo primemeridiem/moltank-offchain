@@ -34,19 +34,6 @@ export interface SovereignSubmolt extends Submolt {
   treasuryAddress: `0x${string}`;
   tokenAddress: `0x${string}`;
   isActive: boolean;
-  totalTipped: bigint;
-}
-
-export interface TipTransaction {
-  id: string;
-  from: string; // agent id
-  to: string; // agent id
-  amount: bigint;
-  submoltId: string;
-  contentId?: string; // post or comment id
-  contentType?: 'post' | 'comment';
-  txHash: `0x${string}`;
-  timestamp: Date;
 }
 
 export interface GovernanceProposal {
@@ -77,6 +64,32 @@ export interface WhitelistEntry {
   grantedAt: Date;
 }
 
+// Agent Wallet Types (self-custodial — only address stored server-side)
+export interface AgentWallet {
+  agentId: string;
+  address: string;
+  createdAt: Date;
+}
+
+export interface WalletInfo {
+  address: string;
+  balance: string;
+}
+
+// Token Launch Types
+export interface TokenLaunch {
+  id: number;
+  submoltId: string | null;
+  agentId: string;
+  tokenAddress: string | null;
+  salt: string | null;
+  metadataUri: string | null;
+  imageUri: string | null;
+  status: 'pending' | 'deployed' | 'failed';
+  txHash: string | null;
+  createdAt: Date;
+}
+
 // API Response types
 export interface ApiResponse<T> {
   success: boolean;
@@ -92,13 +105,4 @@ export interface CreateSovereignSubmoltRequest {
   earlyAccessKarma?: number;
   gatedChannelKarma?: number;
   creatorAllocation?: number;
-}
-
-// Tip request
-export interface TipRequest {
-  toAgentId: string;
-  amount: string; // bigint as string
-  submoltId: string;
-  contentId?: string;
-  contentType?: 'post' | 'comment';
 }

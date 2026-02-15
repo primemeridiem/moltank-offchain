@@ -17,23 +17,6 @@ export type SovereignSubmolt = {
   tokenDeployed: boolean;
 };
 
-export type Tip = {
-  id: string;
-  from: string;
-  to: string;
-  amount: string;
-  submoltId: string;
-  contentId?: string;
-  contentType?: 'post' | 'comment';
-  timestamp: Date;
-};
-
-export type LeaderboardEntry = {
-  agentId: string;
-  received: string;
-  given: string;
-};
-
 export type AccessInfo = {
   agentId: string;
   karma: number;
@@ -45,9 +28,7 @@ export type AccessInfo = {
 
 export type Stats = {
   totalSubmolts: number;
-  totalTips: number;
   totalAgents: number;
-  totalVolume: string;
 };
 
 export type ApiResponse<T> = {

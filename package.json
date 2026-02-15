@@ -1,5 +1,5 @@
 {
-  "name": "moltlayer",
+  "name": "moltank",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,8 +13,12 @@
     "@sinclair/typebox": "^0.34.48",
     "@tailwindcss/typography": "^0.5.19",
     "@tanstack/react-query": "^5.90.20",
+    "drizzle-orm": "^0.45.1",
     "elysia": "^1.4.22",
+    "jose": "^6.1.3",
+    "merkletreejs": "^0.6.0",
     "next": "16.1.6",
+    "postgres": "^3.4.8",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-markdown": "^10.1.0",
@@ -27,6 +31,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.4",
+    "drizzle-kit": "^0.31.8",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",

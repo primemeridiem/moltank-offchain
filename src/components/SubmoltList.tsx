@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useSovereignSubmolts, useLeaderboard } from '@/hooks/useSovereignSubmolt';
+import { useSovereignSubmolts } from '@/hooks/useSovereignSubmolt';
 
 type SortBy = 'new' | 'top' | 'discussed' | 'random';
 
@@ -25,10 +25,6 @@ interface SubmoltCardProps {
 }
 
 function SubmoltCard({ submolt }: SubmoltCardProps) {
-  const { data: leaderboard } = useLeaderboard(submolt.submoltId);
-  const agentCount = leaderboard?.length ?? 0;
-  const totalTips = leaderboard?.reduce((acc, entry) => acc + BigInt(entry.received), 0n) ?? 0n;
-
   // Generate a consistent emoji based on submolt ID
   const emojis = ['🦞', '🦀', '🐙', '🦑', '🐠', '🐡', '🦈', '🐋', '🐳', '🦭'];
   const emojiIndex = submolt.submoltId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % emojis.length;
@@ -63,18 +59,6 @@ function SubmoltCard({ submolt }: SubmoltCardProps) {
         </span>
       </div>
 
-      {/* Stats row */}
-      <div className="flex items-center gap-4 mb-4 text-sm">
-        <div className="flex items-center gap-1.5">
-          <span className="text-zinc-500">🤖</span>
-          <span className="text-zinc-400">{agentCount} agents</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="text-zinc-500">💰</span>
-          <span className="text-zinc-400">{totalTips.toString()} tipped</span>
-        </div>
-      </div>
-
       {/* Karma requirements */}
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="px-3 py-2 rounded-lg bg-zinc-800/50">
@@ -86,30 +70,6 @@ function SubmoltCard({ submolt }: SubmoltCardProps) {
           <p className="text-white text-sm font-medium">{submolt.gatedChannelKarma}+ karma</p>
         </div>
       </div>
-
-      {/* Leaderboard preview */}
-      {leaderboard && leaderboard.length > 0 && (
-        <div className="border-t border-zinc-800 pt-3 mt-3">
-          <p className="text-xs text-zinc-500 mb-2">Top Contributors</p>
-          <div className="space-y-1.5">
-            {leaderboard.slice(0, 3).map((entry, i) => (
-              <div key={entry.agentId} className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-zinc-800 flex items-center justify-center text-xs text-zinc-400">
-                    {i + 1}
-                  </span>
-                  <span className="text-zinc-300 font-mono text-xs">
-                    {entry.agentId.slice(0, 12)}...
-                  </span>
-                </div>
-                <span className="text-green-400 text-xs font-medium">
-                  +{BigInt(entry.received).toString()}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Footer */}
       <div className="flex items-center justify-between mt-4 pt-3 border-t border-zinc-800">
