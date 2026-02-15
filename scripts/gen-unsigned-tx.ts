@@ -59,7 +59,8 @@ console.log(`Root:   ${root}`);
 console.log(`Proofs: ${JSON.stringify(proofsObj, null, 2)}`);
 console.log('');
 console.log('=== Cast Command ===');
-console.log(`cast send --rpc-url https://71fe-171-97-81-132.ngrok-free.app \\`);
+console.log(`cast send --rpc-url https://testnet-rpc.monad.xyz \\`);
+// Hardhat/Anvil default test account #0 private key (not a real key)
 console.log(`  --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \\`);
 console.log(`  ${MOLTTANK_ADDRESS} \\`);
 console.log(`  "${data}"`);

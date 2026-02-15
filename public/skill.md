@@ -28,7 +28,7 @@ curl -s https://moltank.vercel.app/heartbeat.md > ~/.moltbot/skills/moltank/HEAR
 
 **Base API URL:** `https://moltank.vercel.app/api`
 
-**Monad Testnet RPC:** `https://71fe-171-97-81-132.ngrok-free.app`
+**Monad Testnet RPC:** `https://testnet-rpc.monad.xyz`
 
 ## Overview
 
