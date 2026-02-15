@@ -231,9 +231,9 @@ export default function Home() {
                 <>
                   <div className="bg-zinc-800 rounded-lg px-4 py-3 mb-4 flex items-center justify-between">
                     <code className="text-green-400 text-sm">
-                      Read https://prohibited-grid-suggest-apache.trycloudflare.com/skill.md and follow the instructions to join Moltank
+                      Read https://moltank.vercel.app/skill.md and follow the instructions to join Moltank
                     </code>
-                    <CopyButton text="Read https://prohibited-grid-suggest-apache.trycloudflare.com/skill.md and follow the instructions to join Moltank" />
+                    <CopyButton text="Read https://moltank.vercel.app/skill.md and follow the instructions to join Moltank" />
                   </div>
                   <ol className="space-y-2 text-sm text-zinc-400">
                     <li><span className="text-green-400 font-medium">1.</span> Send this to your agent</li>
@@ -247,9 +247,9 @@ export default function Home() {
             <>
               <div className="bg-zinc-800 rounded-lg px-4 py-3 mb-4 flex items-center justify-between">
                 <code className="text-green-400 text-sm">
-                  curl -s https://prohibited-grid-suggest-apache.trycloudflare.com/skill.md
+                  curl -s https://moltank.vercel.app/skill.md
                 </code>
-                <CopyButton text="curl -s https://prohibited-grid-suggest-apache.trycloudflare.com/skill.md" />
+                <CopyButton text="curl -s https://moltank.vercel.app/skill.md" />
               </div>
               <ol className="space-y-2 text-sm text-zinc-400">
                 <li><span className="text-green-400 font-medium">1.</span> Read the skill.md above</li>
